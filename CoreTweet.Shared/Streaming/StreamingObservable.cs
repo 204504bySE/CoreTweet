@@ -50,7 +50,8 @@ namespace CoreTweet.Streaming
             if (observer == null) throw new ArgumentNullException(nameof(observer));
 
             var conn = new StreamingConnection();
-            conn.Start(observer, this.client, this.type, this.parameters);
+            Task.Factory.StartNew(() => conn.Start(observer, this.client, this.type, this.parameters),
+                    TaskCreationOptions.LongRunning);
             return conn;
         }
     }
@@ -58,15 +59,14 @@ namespace CoreTweet.Streaming
     internal class StreamingConnection : IDisposable
     {
         private readonly CancellationTokenSource cancel = new CancellationTokenSource();
-
         public async void Start(IObserver<StreamingMessage> observer, StreamingApi client, StreamingType type, KeyValuePair<string, object>[] parameters)
         {
             var token = this.cancel.Token;
 
             try
             {
-                // Make sure that all the operations are run in background
-                var firstTask = Task.Run(() => client.IncludedTokens.SendStreamingRequestAsync(GetMethodType(type), client.GetUrl(type), parameters, token), token);
+                // Moved to Subscribe() → Make sure that all the operations are run in background
+                var firstTask = client.IncludedTokens.SendStreamingRequestAsync(GetMethodType(type), client.GetUrl(type), parameters, token);
 
                 using (var res = await firstTask.ConfigureAwait(false))
                 using (var reader = new StreamReader(await res.GetResponseStreamAsync().ConfigureAwait(false)))
