@@ -50,8 +50,7 @@ namespace CoreTweet.Streaming
             if (observer == null) throw new ArgumentNullException(nameof(observer));
 
             var conn = new StreamingConnection();
-            Task.Factory.StartNew(() => conn.Start(observer, this.client, this.type, this.parameters),
-                    TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(async() => await conn.Start(observer, this.client, this.type, this.parameters).ConfigureAwait(false));
             return conn;
         }
     }
@@ -59,7 +58,7 @@ namespace CoreTweet.Streaming
     internal class StreamingConnection : IDisposable
     {
         private readonly CancellationTokenSource cancel = new CancellationTokenSource();
-        public async void Start(IObserver<StreamingMessage> observer, StreamingApi client, StreamingType type, KeyValuePair<string, object>[] parameters)
+        public async Task Start(IObserver<StreamingMessage> observer, StreamingApi client, StreamingType type, KeyValuePair<string, object>[] parameters)
         {
             var token = this.cancel.Token;
 
