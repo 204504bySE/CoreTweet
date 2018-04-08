@@ -50,7 +50,7 @@ namespace CoreTweet.Streaming
             if (observer == null) throw new ArgumentNullException(nameof(observer));
 
             var conn = new StreamingConnection();
-            Task.Run(async() => await conn.Start(observer, this.client, this.type, this.parameters).ConfigureAwait(false));
+            conn.Start(observer, this.client, this.type, this.parameters).ConfigureAwait(false);
             return conn;
         }
     }
