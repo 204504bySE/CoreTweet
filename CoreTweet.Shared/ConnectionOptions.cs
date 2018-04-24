@@ -88,7 +88,7 @@ namespace CoreTweet
             }
             set
             {
-                if(value <= 0 && value != System.Threading.Timeout.Infinite)
+                if (value <= 0 && value != System.Threading.Timeout.Infinite)
                     throw new ArgumentOutOfRangeException();
                 this.timeout = value;
             }
@@ -173,16 +173,18 @@ namespace CoreTweet
         }
 
 #if ASYNC
-        private HttpClient httpClient;
+        private static HttpClient httpClient;
         private HttpClientHandler handler;
 
         private bool IsOptionsChanged()
         {
-            return this.httpClient == null
-                || (this.UseCompression && this.handler.AutomaticDecompression == DecompressionMethods.None)
-                || this.UseProxy != this.handler.UseProxy
-                || this.Proxy != this.handler.Proxy
-                || this.Timeout != this.httpClient.Timeout.Ticks / TimeSpan.TicksPerMillisecond;
+            return ConnectionOptions.httpClient == null;
+            /*
+                            || (this.UseCompression && this.handler.AutomaticDecompression == DecompressionMethods.None)
+                            || this.UseProxy != this.handler.UseProxy
+                            || this.Proxy != this.handler.Proxy
+                            || this.Timeout != ConnectionOptions.httpClient.Timeout.Ticks / TimeSpan.TicksPerMillisecond;
+            */
         }
 
         internal HttpClient GetHttpClient()
@@ -190,16 +192,16 @@ namespace CoreTweet
             if (this.IsOptionsChanged())
             {
                 this.handler = new HttpClientHandler();
-                this.httpClient = new HttpClient(this.handler);
+                ConnectionOptions.httpClient = new HttpClient(this.handler);
 
                 this.handler.AutomaticDecompression = this.UseCompression
                     ? Request.CompressionType : DecompressionMethods.None;
                 this.handler.UseProxy = this.UseProxy;
                 this.handler.Proxy = this.Proxy;
-                this.httpClient.Timeout = new TimeSpan(TimeSpan.TicksPerMillisecond * this.Timeout);
+                //ConnectionOptions.httpClient.Timeout = new TimeSpan(TimeSpan.TicksPerMillisecond * this.Timeout);
             }
 
-            return this.httpClient;
+            return ConnectionOptions.httpClient;
         }
 #endif
     }
