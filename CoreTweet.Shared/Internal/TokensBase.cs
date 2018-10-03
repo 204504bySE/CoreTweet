@@ -30,11 +30,7 @@ using System.Net;
 using System.Threading;
 using CoreTweet.Rest;
 using CoreTweet.Streaming;
-
-#if WIN_RT
-using Windows.Storage;
-using Windows.Storage.Streams;
-#endif
+using CoreTweet.AccountActivity;
 
 namespace CoreTweet.Core
 {
@@ -146,6 +142,10 @@ namespace CoreTweet.Core
         /// Gets the wrapper of the Streaming API.
         /// </summary>
         public StreamingApi Streaming => new StreamingApi(this);
+        /// <summary>
+        /// Gets the wrapper of the Account Activity API.
+        /// </summary>
+        public AccountActivityApi AccountActivity => new AccountActivityApi(this);
         #endregion
 
         /// <summary>
@@ -334,16 +334,7 @@ namespace CoreTweet.Core
 
                 if (v is string) return false;
 
-                return v is Stream || v is IEnumerable<byte> || v is ArraySegment<byte>
-#if FILEINFO
-                    || v is FileInfo
-#endif
-#if WIN_RT
-                    || v is IInputStream || v is IBuffer || v is IInputStreamReference
-#endif
-#if !FILEINFO
-                    || v.GetType().FullName == "System.IO.FileInfo"
-#endif
+                return v is Stream || v is IEnumerable<byte> || v is ArraySegment<byte> || v is FileInfo
                 ;
             });
         }
