@@ -185,18 +185,23 @@ namespace CoreTweet
                 || this.Timeout != this.httpClient.Timeout.Ticks / TimeSpan.TicksPerMillisecond;
         }
 
+        public HttpClient ExternalHttpClient { get; set; }
+
         internal HttpClient GetHttpClient()
         {
+            if (ExternalHttpClient != null) { return ExternalHttpClient; }
             if (this.IsOptionsChanged())
             {
-                this.handler = new HttpClientHandler();
-                this.httpClient = new HttpClient(this.handler);
-
-                this.handler.AutomaticDecompression = this.UseCompression
-                    ? Request.CompressionType : DecompressionMethods.None;
-                this.handler.UseProxy = this.UseProxy;
-                this.handler.Proxy = this.Proxy;
-                this.httpClient.Timeout = new TimeSpan(TimeSpan.TicksPerMillisecond * this.Timeout);
+                this.handler = new HttpClientHandler()
+                {
+                    AutomaticDecompression = this.UseCompression ? Request.CompressionType : DecompressionMethods.None,
+                    UseProxy = this.UseProxy,
+                    Proxy = this.Proxy
+                };
+                this.httpClient = new HttpClient(this.handler)
+                {
+                    Timeout = new TimeSpan(TimeSpan.TicksPerMillisecond * this.Timeout),
+                };
             }
 
             return this.httpClient;
