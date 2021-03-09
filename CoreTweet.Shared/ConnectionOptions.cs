@@ -74,7 +74,21 @@ namespace CoreTweet
         /// Gets or sets the version of the Twitter API.
         /// <para>Default: <c>"1.1"</c></para>
         /// </summary>
-        public string ApiVersion { get; set; } = "1.1";
+        [Obsolete("This property will removed in future release.")]
+        public string ApiVersion
+        {
+            get
+            {
+                return UrlPrefix;
+            }
+            set
+            {
+                UrlPrefix = value;
+            }
+        }
+
+        internal string UrlPrefix { get; set; } = "1.1";
+        internal string UrlSuffix { get; set; } = ".json";
 
         private int timeout = 100000;
         /// <summary>
@@ -145,11 +159,22 @@ namespace CoreTweet
         /// </summary>
         public bool DisableKeepAlive { get; set; } = true;
 
+#if !NETCORE
         /// <summary>
         /// Creates a new object that is a copy of the current instance.
         /// </summary>
         /// <returns>A new object that is a copy of this instance.</returns>
-        public object Clone()
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+#endif
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <returns>A new object that is a copy of this instance.</returns>
+        public ConnectionOptions Clone()
         {
             return new ConnectionOptions()
             {
@@ -158,7 +183,8 @@ namespace CoreTweet
                 UserStreamUrl = this.UserStreamUrl,
                 SiteStreamUrl = this.SiteStreamUrl,
                 StreamUrl = this.StreamUrl,
-                ApiVersion = this.ApiVersion,
+                UrlPrefix = this.UrlPrefix,
+                UrlSuffix = this.UrlSuffix,
                 Timeout = this.Timeout,
 #if SYNC
                 ReadWriteTimeout = this.ReadWriteTimeout,
@@ -173,38 +199,44 @@ namespace CoreTweet
         }
 
 #if ASYNC
-        private HttpClient httpClient;
-        private HttpClientHandler handler;
+        private Tuple<HttpClient, HttpClientHandler> httpClientTuple;
 
-        private bool IsOptionsChanged()
+        private bool IsOptionsChanged(Tuple<HttpClient, HttpClientHandler> httpClientTuple)
         {
-            return this.httpClient == null
-                || (this.UseCompression && this.handler.AutomaticDecompression == DecompressionMethods.None)
-                || this.UseProxy != this.handler.UseProxy
-                || this.Proxy != this.handler.Proxy
-                || this.Timeout != this.httpClient.Timeout.Ticks / TimeSpan.TicksPerMillisecond;
+            if (httpClientTuple == null) return true;
+
+            var httpClient = httpClientTuple.Item1;
+            var handler = httpClientTuple.Item2;
+
+            return (this.UseCompression && handler.AutomaticDecompression == DecompressionMethods.None)
+                || this.UseProxy != handler.UseProxy
+                || !Equals(this.Proxy, handler.Proxy)
+                || this.Timeout != httpClient.Timeout.Ticks / TimeSpan.TicksPerMillisecond;
         }
 
         public HttpClient ExternalHttpClient { get; set; }
 
         internal HttpClient GetHttpClient()
         {
-            if (ExternalHttpClient != null) { return ExternalHttpClient; }
-            if (this.IsOptionsChanged())
+            // Copy the reference for thread safety
+            var httpClientTuple = this.httpClientTuple;
+
+            if (this.IsOptionsChanged(httpClientTuple))
             {
-                this.handler = new HttpClientHandler()
-                {
-                    AutomaticDecompression = this.UseCompression ? Request.CompressionType : DecompressionMethods.None,
-                    UseProxy = this.UseProxy,
-                    Proxy = this.Proxy
-                };
-                this.httpClient = new HttpClient(this.handler)
-                {
-                    Timeout = new TimeSpan(TimeSpan.TicksPerMillisecond * this.Timeout),
-                };
+                var handler = new HttpClientHandler();
+                var httpClient = new HttpClient(handler);
+
+                handler.AutomaticDecompression = this.UseCompression
+                    ? Request.CompressionType : DecompressionMethods.None;
+                handler.UseProxy = this.UseProxy;
+                handler.Proxy = this.Proxy;
+                httpClient.Timeout = new TimeSpan(TimeSpan.TicksPerMillisecond * this.Timeout);
+                httpClient.DefaultRequestVersion = HttpVersion.Version20;
+                httpClientTuple = Tuple.Create(httpClient, handler);
+                this.httpClientTuple = httpClientTuple;
             }
 
-            return this.httpClient;
+            return httpClientTuple.Item1;
         }
 #endif
     }

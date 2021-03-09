@@ -4,6 +4,8 @@ CoreTweet
 [![Build Status on Travis CI](https://travis-ci.org/CoreTweet/CoreTweet.svg?branch=test%2Ftravis)](https://travis-ci.org/CoreTweet/CoreTweet)
 [![Build Status on AppVeyor](https://ci.appveyor.com/api/projects/status/github/CoreTweet/CoreTweet)](https://ci.appveyor.com/project/azyobuzin/CoreTweet)
 [![Gitter chat](https://badges.gitter.im/CoreTweet/gitter.png)](https://gitter.im/CoreTweet)
+[![Standard](https://img.shields.io/endpoint?url=https%3A%2F%2Ftwbadges.glitch.me%2Fbadges%2Fstandard)](https://developer.twitter.com/en/docs/twitter-api)
+[![v2](https://img.shields.io/endpoint?url=https%3A%2F%2Ftwbadges.glitch.me%2Fbadges%2Fv2)](https://developer.twitter.com/en/docs/twitter-api)
 
 Yet Another .NET Twitter Library...
 
@@ -108,7 +110,7 @@ You can't build PCL/WindowsRT binaries on Mono (on Linux) because they require n
 * .NET Framework 4.6
 * Windows PowerShell
 * Visual Studio 2017
-* .NET Core 2.1 SDK
+* .NET Core 3.1 SDK
 * Doxygen (optional: used to generate documentation)
 
 #### Step
@@ -140,7 +142,7 @@ Please report to [Issues](https://github.com/CoreTweet/CoreTweet/issues?state=op
 
 We seriously need your help for writing documents.
 
-Please go to [Wiki](https://github.com/CoreTweet/CoreTweet/wiki) and write API documents, articles or/and some tips!
+Please go to [Wiki](https://github.com/CoreTweet/CoreTweet/wiki) and write API documentation, articles and/or some tips!
 
 Pull requests are welcome.
 

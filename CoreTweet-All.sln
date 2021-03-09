@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreTweet.net40", "CoreTweet.net40\CoreTweet.net40.csproj", "{B8237636-EC72-47BD-887B-E66D4123F422}"
 EndProject
@@ -24,6 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreTweet", "CoreTweet\Core
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		CoreTweet.Shared\CoreTweet.Shared.projitems*{00d06b71-e59a-48e2-8082-e8fbf5ed5eaa}*SharedItemsImports = 5
 		CoreTweet.Shared\CoreTweet.Shared.projitems*{0143f454-1d66-48d0-aa28-7ba7a2502ea5}*SharedItemsImports = 13
 		CoreTweet.Shared\CoreTweet.Shared.projitems*{5ae5a341-5e2b-42af-946a-7043bad12817}*SharedItemsImports = 4
 		CoreTweet.Shared\CoreTweet.Shared.projitems*{b8237636-ec72-47bd-887b-e66d4123f422}*SharedItemsImports = 4
